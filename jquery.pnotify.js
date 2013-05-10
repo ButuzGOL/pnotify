@@ -455,7 +455,7 @@
 							break;
 					}
 					// Move the notice on dir1.
-					if (s.nextpos1) {
+					if (s.nextpos1 || s.dir1 === "down" || s.dir1 === "up") {
 						// Animate if we're moving toward the first pos.
 						if (s.animation && (curpos1 > s.nextpos1 || animate.top || animate.bottom || animate.right || animate.left)) {
 							switch (s.dir1) {
@@ -809,6 +809,11 @@
 			if (opts.auto_display)
 				pnotify.pnotify_display();
 
+			// Adding styles
+			if (opts.container_style)
+				pnotify.container.attr("style", pnotify.container.attr("style") + " " + opts.container_style);
+			if (opts.style)
+				pnotify.attr("style", pnotify.attr("style") + " " + opts.style);
 			return pnotify;
 		}
 	});
@@ -902,7 +907,7 @@
 		// After a delay, remove the notice.
 		hide: true,
 		// Delay in milliseconds before the notice is removed.
-		delay: 8000,
+		delay: 4000,
 		// Reset the hide timer if the mouse moves over the notice.
 		mouse_reset: true,
 		// Remove the notice's elements from the DOM after it is removed.
@@ -910,6 +915,10 @@
 		// Change new lines to br tags.
 		insert_brs: true,
 		// The stack on which the notices will be placed. Also controls the direction the notices stack.
-		stack: {"dir1": "down", "dir2": "left", "push": "bottom", "spacing1": 25, "spacing2": 25}
+		stack: {"dir1": "down", "dir2": "left", "push": "bottom", "spacing1": 25, "spacing2": 25},
+		// Style for container
+		style: "",
+		// Style for container
+		container_style: ""
 	};
 })(jQuery);
