@@ -51,7 +51,8 @@
 				hi_menu: "well",
 				hi_btn: "btn",
 				hi_btnhov: "",
-				hi_hnd: "icon-chevron-down"
+				hi_hnd: "icon-chevron-down",
+				move: "icon-move"
 			}
 		};
 	// Set global variables.
@@ -177,6 +178,7 @@
 					// Show the buttons.
 					if (opts.sticker && !opts.nonblock) pnotify.sticker.trigger("pnotify_icon").css("visibility", "visible");
 					if (opts.closer && !opts.nonblock) pnotify.closer.css("visibility", "visible");
+					if (opts.move && !opts.nonblock) pnotify.move.css("visibility", "visible");
 				},
 				"mouseleave": function(e){
 					if (opts.nonblock) e.stopPropagation();
@@ -192,6 +194,8 @@
 						pnotify.sticker.css("visibility", "hidden");
 					if (opts.closer_hover)
 						pnotify.closer.css("visibility", "hidden");
+					if (opts.move_hover)
+						pnotify.move.css("visibility", "hidden");
 					$.pnotify_position_all();
 				},
 				"mouseover": function(e){
@@ -323,6 +327,10 @@
 					pnotify.closer.css("display", "none");
 				else
 					pnotify.closer.css("display", "block");
+				if (!opts.move || opts.nonblock)
+					pnotify.move.css("display", "none");
+				else
+					pnotify.move.css("display", "block");
 				if (!opts.sticker || opts.nonblock)
 					pnotify.sticker.css("display", "none");
 				else
@@ -338,6 +346,10 @@
 					pnotify.closer.css("visibility", "hidden");
 				else if (!opts.nonblock)
 					pnotify.closer.css("visibility", "visible");
+				if (opts.move_hover)
+					pnotify.move.css("visibility", "hidden");
+				else if (!opts.nonblock)
+					pnotify.move.css("visibility", "visible");
 				// Update the timed hiding.
 				if (!opts.hide)
 					pnotify.pnotify_cancel_remove();
@@ -350,6 +362,9 @@
 			// Position the notice. dont_skip_hidden causes the notice to
 			// position even if it's not visible.
 			pnotify.pnotify_position = function(dont_skip_hidden){
+				if (pnotify.wasMoved)
+					return;
+
 				// Get the notice's stack.
 				var s = pnotify.opts.stack;
 				if (!s) return;
@@ -630,6 +645,7 @@
 					pnotify.pnotify_remove();
 					pnotify.sticker.css("visibility", "hidden");
 					pnotify.closer.css("visibility", "hidden");
+					pnotify.move.css("visibility", "hidden");
 				}
 			})
 			.append($("<span />", {"class": styles.closer}))
@@ -658,6 +674,15 @@
 			if (!opts.sticker || opts.nonblock)
 				pnotify.sticker.css("display", "none");
 
+			pnotify.move = $("<div />", {
+				"class": "ui-pnotify-move",
+				"css": {"cursor": "pointer", "visibility": opts.move_hover ? "hidden" : "visible"}
+			})
+			.append($("<span />", {"class": styles.move}))
+			.appendTo(pnotify.container);
+			if (!opts.move || opts.nonblock)
+				pnotify.move.css("display", "none");
+
 			// Add the appropriate icon.
 			if (opts.icon !== false) {
 				$("<div />", {"class": "ui-pnotify-icon"})
@@ -670,7 +695,7 @@
 				"class": "ui-pnotify-title"
 			})
 			.appendTo(pnotify.container);
-			if (opts.title === false)
+			if (Boolean(opts.title) === false)
 				pnotify.title_container.hide();
 			else if (opts.title_escape)
 				pnotify.title_container.text(opts.title);
@@ -814,6 +839,16 @@
 				pnotify.container.attr("style", pnotify.container.attr("style") + " " + opts.container_style);
 			if (opts.style)
 				pnotify.attr("style", pnotify.attr("style") + " " + opts.style);
+
+			if (opts.move) {
+				$(pnotify).draggable({ 
+					handle: '.ui-pnotify-move',
+					start: function() {
+						pnotify.css({ 'bottom': 'auto' });
+						pnotify.wasMoved = true;
+					}
+				});
+			}
 			return pnotify;
 		}
 	});
@@ -919,6 +954,10 @@
 		// Style for container
 		style: "",
 		// Style for container
-		container_style: ""
+		container_style: "",
+		// Provide a move.
+		move: true,
+		// Only show the move button on hover.
+		move_hover: true
 	};
 })(jQuery);
